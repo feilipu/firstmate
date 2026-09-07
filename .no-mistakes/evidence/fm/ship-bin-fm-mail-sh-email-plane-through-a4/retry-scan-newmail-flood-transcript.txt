@@ -1,0 +1,44 @@
+# Mail-plane retry-scan under a new-mail flood
+
+Public interface: bin/fm-mail.py cmd_poll_list (the poll engine the
+standing mail check consumes). Fake IMAP: sustained new uid 400 plus
+retry set 301-320. Window size with cap=4 is 16, so uid 320 sits past
+the first scan.
+
+## Scenario A — unfetchable retry prefix
+Retry uids 301-319 fail FETCH; 320 has recovered metadata.
+
+=== poll 1: new-mail flood, unfetchable retry prefix 301-316 ===
+poll_list exit: 0
+poll_list stdout:
+uidvalidity	90009
+400		z@x.c	rec	ok
+retry-scan position: '16'
+
+=== poll 2: cursor should have marched; recovered uid 320 surfaces as retry ===
+poll_list exit: 0
+poll_list stdout:
+uidvalidity	90009
+400		z@x.c	rec	ok
+320		z@x.c	rec	retry
+retry-scan position: '19'
+
+
+## Scenario B — unseen retry prefix
+Retry uids 301-319 are absent from the seen cursor; only 320 is eligible.
+
+=== poll 1: new-mail flood, unseen retry prefix 301-316 ===
+poll_list exit: 0
+poll_list stdout:
+uidvalidity	90009
+400		z@x.c	rec	ok
+retry-scan position: '16'
+
+=== poll 2: cursor should have marched; recovered uid 320 surfaces as retry ===
+poll_list exit: 0
+poll_list stdout:
+uidvalidity	90009
+400		z@x.c	rec	ok
+320		z@x.c	rec	retry
+retry-scan position: '16'
+
