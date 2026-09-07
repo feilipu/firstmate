@@ -1,0 +1,64 @@
+Mail-plane retry-scan under a new-mail flood
+============================================
+Public interface: python3 bin/fm-mail.py cmd_poll_list
+(the poll engine bash consumes; fake IMAP, no network)
+
+Scenario A — every uid in the current retry window is unfetchable
+while new mail keeps arriving. A recovered uid sits beyond that window.
+
+  retry set: 301..320 (301-319 unfetchable; 320 recovered)
+  new unseen: 400
+  cap=4, scan window=16
+  retry-scan position before poll 1: 0
+
+  --- poll 1 stdout ---
+  uidvalidity	90009
+  400		later@example.com	recovered later uid	ok
+  --- poll 1 exit 0
+  retry-scan position after poll 1: 16
+
+  Observation: new mail 400 is emitted; recovered uid 320 is not yet
+  fetched. The retry-scan cursor still advances from 0 to 16 instead of
+  stalling on the failed prefix because `out` was non-empty.
+
+  --- poll 2 stdout ---
+  uidvalidity	90009
+  400		later@example.com	recovered later uid	ok
+  320		later@example.com	recovered later uid	retry
+  --- poll 2 exit 0
+  retry-scan position after poll 2: 19
+
+  Observation: uid 320 now surfaces as status=retry with real From/Subject.
+
+Scenario B — the current retry window holds only uids absent from the
+seen cursor, while new mail fills the poll and a later eligible retry
+uid sits beyond the window.
+
+  retry set: 301..320; cursor records only 320
+  new unseen: 400
+  retry-scan position before poll 1: 0
+
+  --- poll 1 stdout ---
+  uidvalidity	90009
+  400		later@example.com	recovered later uid	ok
+  --- poll 1 exit 0
+  retry-scan position after poll 1: 16
+
+  --- poll 2 stdout ---
+  uidvalidity	90009
+  400		later@example.com	recovered later uid	ok
+  320		later@example.com	recovered later uid	retry
+  --- poll 2 exit 0
+  retry-scan position after poll 2: 16
+
+  Observation: the all-unseen window also advances under the flood, so
+  the later recovered uid surfaces on the next poll.
+
+Regression tests (from tests/fm-mail.test.sh)
+---------------------------------------------
+ok - fm-mail: an unfetchable retry window still advances while new mail fills out
+ok - fm-mail: an unseen retry window still advances while new mail fills out
+ok - fm-mail: the reserved retry budget survives a new-mail flood
+ok - fm-mail: a retry window of unseen uids never stalls the cursor
+ok - fm-mail: retry budget advances the scan by examined candidates, not the window
+ok - fm-mail: a zero retry budget leaves the retry-scan position unchanged
