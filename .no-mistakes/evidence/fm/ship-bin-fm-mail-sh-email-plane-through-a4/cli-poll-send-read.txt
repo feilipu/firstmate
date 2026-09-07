@@ -1,0 +1,28 @@
+=== poll 1: new unseen mail surfaces as a check wake ===
+fm-mail: woke for 42
+
+=== persisted cursor (state/.mail-seen) ===
+uidvalidity=10001
+42
+
+=== persisted wake queue (state/.wake-queue) ===
+1788764302	1	check	mail:10001/42	check: mail 42 - mail from alice@example.com - Hello from the mail plane
+
+=== poll 2: same uid must not re-wake ===
+fm-mail: no new mail
+
+=== status after poll ===
+mail account: captain@example.com
+imap: imap.example.com:993 smtp: smtp.example.com:465
+cursor: uidvalidity=10001
+42
+
+=== send ===
+sent ok
+
+=== read digest ===
+42	2026-09-05T12:00:00Z	alice@example.com	Hello from the mail plane	First line of the body
+
+=== mail-check check after healthy poll (should be silent) ===
+EXIT:0
+(empty output plus EXIT:0 means a healthy poll stays silent)

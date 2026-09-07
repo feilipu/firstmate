@@ -1,0 +1,34 @@
+=== setup: uid 77 already cursor-recorded, sitting in .mail-retry (chmod 000) ===
+cursor:
+uidvalidity=90009
+77
+retry (unreadable by design after chmod 000; ls):
+---------- 1 phillip phillip 3 Sep  7 06:58 /tmp/fm-mail-retry-evidence.khTwDj/home/state/.mail-retry
+
+=== poll 1: publish recovery wake, then fail closed on retry clear ===
+fm-mail: could not clear retry for recovered 77 after publish; retried on next poll
+fm-mail: wake failed for 77; retried on next poll
+exit=1
+
+wake-queue after poll 1:
+1788764334	1	check	mail:90009/77	check: mail 77 - mail from from@x - Re: hi
+
+=== poll 2: still fail closed, must NOT append a second wake ===
+fm-mail: could not clear retry for recovered 77 after publish; retried on next poll
+exit=1
+
+wake-queue after poll 2 (still one row):
+1788764334	1	check	mail:90009/77	check: mail 77 - mail from from@x - Re: hi
+wake count for uid 77: 1
+
+=== poll 3: restore writable retry file; clear without re-waking ===
+retry file still contains:
+77
+fm-mail: no new mail
+exit=0
+
+retry file after successful clear:
+(empty)
+wake-queue still one recovery wake:
+1788764334	1	check	mail:90009/77	check: mail 77 - mail from from@x - Re: hi
+wake count for uid 77: 1

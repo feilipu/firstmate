@@ -1,0 +1,32 @@
+=== fm-mail.sh --help ===
+fm-mail.sh read
+fm-mail.sh send <to> <subject> <body | ->
+fm-mail.sh poll
+fm-mail.sh status
+
+=== fm-mail.sh status (configured, no network) ===
+mail account: captain@example.com
+imap: imap.example.com:993 smtp: smtp.example.com:465
+cursor: (none)
+
+=== fm-mail.sh status (unconfigured) ===
+fm-mail: missing required $FM_HOME/.env value: FM_MAIL_USER
+fm-mail: add FM_MAIL_USER (and the other three FM_MAIL_* values) to /tmp/fm-mail-evidence.jyVdbj/home/.env
+
+=== fm-mail.sh unknown subcommand ===
+fm-mail.sh read
+fm-mail.sh send <to> <subject> <body | ->
+fm-mail.sh poll
+fm-mail.sh status
+
+=== fm-mail-check.sh --help ===
+Usage:
+  fm-mail-check.sh [check]   run the received-mail poll, silent on success
+  fm-mail-check.sh arm       write and register state/mail.check.sh
+  fm-mail-check.sh disarm    remove the check shim, its trust binding, and the record
+  fm-mail-check.sh --help    print this help
+
+Mail configuration (FM_MAIL_USER, FM_MAIL_PASS, FM_IMAP_HOST, FM_SMTP_HOST,
+FM_IMAP_PORT, FM_SMTP_PORT) is read from <FM_HOME>/.env by fm-mail.sh.
+See docs/configuration.md "Mail plane" for the schema.
+
