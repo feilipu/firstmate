@@ -1,0 +1,8 @@
+=== poll_list after IMAP login when SEARCH raises ===
+# public interface: python3 bin/fm-mail.py poll_list (via cmd_poll_list)
+exit=1
+stderr/stdout:
+fm-mail poll error: search failed
+
+IMAP session marker:
+logged-out

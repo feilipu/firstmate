@@ -1,0 +1,18 @@
+=== cap=1 retry turn; uid 81 unfetchable, 82 recovered, 100 new ===
+=== .mail-retry-pos is a directory so the persist write fails closed ===
+turn before poll: 1
+poll 1 exit=1
+poll 1 output:
+uidvalidity	90009
+82		a@b.c	good	retry
+fm-mail poll error: [Errno 21] Is a directory: '/tmp/tmp.b3NVuzUBTV/state/.mail-retry-pos'
+turn after failed retry-pos write: 1
+
+=== retry-pos writable again; next poll must still spend the retry turn on 82 ===
+turn before poll 2: 1
+poll 2 exit=0
+poll 2 output:
+uidvalidity	90009
+82		a@b.c	good	retry
+turn after successful poll: 0
+retry-pos after successful poll: 1
