@@ -1,0 +1,2 @@
+1788928787	1	check	mail:10001/42	check: mail 42 - mail from alice@example.com - Hello captain
+1788928788	2	check	mail:10001/99	check: mail 99 - mail from bob@example.com - Follow-up
